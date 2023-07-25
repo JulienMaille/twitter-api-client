@@ -803,6 +803,16 @@ class Account:
             log(self.logger, self.debug, r)
         return r.json()
 
+    def mentions(self, params: dict = None) -> dict:
+        r = self.session.get(
+            f'{self.v2_api}/notifications/mentions.json',
+            headers=get_headers(self.session),
+            params=params or live_notification_params
+        )
+        if self.debug:
+            log(self.logger, self.debug, r)
+        return r.json()
+
     def recommendations(self, params: dict = None) -> dict:
         r = self.session.get(
             f'{self.v1_api}/users/recommendations.json',
