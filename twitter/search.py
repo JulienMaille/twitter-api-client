@@ -71,7 +71,7 @@ class Search:
                 params['variables']['cursor'] = cursor
             data, entries, cursor = await self.backoff(lambda: self.get(client, params), **kwargs)
             res.extend(entries)
-            if len(entries) <= 2 or len(total) >= limit:  # just cursors
+            if entries == [] or len(total) >= limit:
                 self.debug and self.logger.debug(
                     f'[{GREEN}success{RESET}] Returned {len(total)} search results for {query["query"]}')
                 return res
