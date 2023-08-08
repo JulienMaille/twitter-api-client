@@ -110,10 +110,10 @@ class Search:
                     return data, entries, cursor
             except Exception as e:
                 if i == retries:
-                    self.logger.debug(f'Max retries exceeded\n{e}')
+                    self.debug and self.logger.debug(f'Max retries exceeded\n{e}')
                     return
                 t = 2 ** i + random.random()
-                self.logger.debug(f'Retrying in {f"{t:.2f}"} seconds\t\t{e}')
+                self.debug and self.logger.debug(f'Retrying in {f"{t:.2f}"} seconds\t\t{e}')
                 await asyncio.sleep(t)
 
     def _init_logger(self, **kwargs) -> Logger:
