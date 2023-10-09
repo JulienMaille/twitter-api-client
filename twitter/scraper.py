@@ -571,6 +571,11 @@ class Scraper:
             prev_len = len(ids)
             if prev_len >= limit:
                 break
+
+            # Introducing the delay
+            print("Waiting for 10 seconds before next pagination attempt...")
+            await asyncio.sleep(10)
+            
             try:
                 r = await self._query(client, operation, cursor=cursor, **kwargs)
                 data = r.json()
