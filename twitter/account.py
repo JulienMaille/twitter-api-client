@@ -103,7 +103,7 @@ class Account:
         else:
             variables['message']['text'] = {'text': text}
         res = self.gql('POST', Operation.useSendMessageMutation, variables)
-        if find_key(res, 'dm_validation_failure_type'):
+        if self.debug and find_key(res, 'dm_validation_failure_type'):
             self.logger.debug(f"{RED}Failed to send DM(s) to {receivers}{RESET}")
         return res
 
