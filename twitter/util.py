@@ -12,14 +12,6 @@ from httpx import Response, Client
 
 from .constants import GREEN, MAGENTA, RED, RESET, ID_MAP, MAX_GQL_CHAR_LIMIT, USER_AGENTS
 
-class _Parameters:
-    def __init__(self, **kwargs):
-        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
-
-    def set_user_agent(self, user_agent):
-        self.user_agent = user_agent
-
-parameters = _Parameters()
 
 def init_session():
     client = Client(headers={
@@ -133,7 +125,7 @@ def get_headers(session, **kwargs) -> dict:
         'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
         'cookie': '; '.join(f'{k}={v}' for k, v in cookies.items()),
         'referer': 'https://twitter.com/',
-        'user-agent': parameters.user_agent,
+        'user-agent': random.choice(USER_AGENTS),
         'x-csrf-token': cookies.get('ct0', ''),
         'x-guest-token': cookies.get('guest_token', ''),
         'x-twitter-auth-type': 'OAuth2Session' if cookies.get('auth_token') else '',
