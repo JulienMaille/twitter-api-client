@@ -633,6 +633,7 @@ class Scraper:
                 return
         while (dups < DUP_LIMIT) and cursor:
             prev_len = len(ids)
+            prev_cursor = cursor
             if prev_len >= limit:
                 break
 
@@ -648,6 +649,9 @@ class Scraper:
                     self.logger.error(f'Failed to get pagination data\n{e}')
                 return
             cursor = get_cursor(data)
+            if cursor == prev_cursor:
+                break
+
             ids |= {x for x in find_key(data, 'rest_id') if x[0].isnumeric()}
 
             if self.debug:
