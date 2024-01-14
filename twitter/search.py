@@ -68,12 +68,12 @@ class Search:
             if cursor:
                 params['variables']['cursor'] = cursor
             data, entries, cursor = await self.backoff(lambda: self.get(client, params), **kwargs)
+            total |= set(find_key(entries, 'entryId'))
             res.extend(entries)
             if entries == [] or len(total) >= limit:
                 self.debug and self.logger.debug(
                     f'[{GREEN}success{RESET}] Returned {len(total)} search results for {query["query"]}')
                 return res
-            total |= set(find_key(entries, 'entryId'))
             self.debug and self.logger.debug(f'{query["query"]}')
             self.save and (out / f'{time.time_ns()}.json').write_bytes(orjson.dumps(entries))
 
