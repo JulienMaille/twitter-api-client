@@ -638,9 +638,9 @@ class Scraper:
                 break
 
             # Introducing the delay
-            print("Waiting for 10 seconds before next pagination attempt...")
-            await asyncio.sleep(10)
-            
+            print(f"{prev_len}/{limit} Waiting for 5 seconds before next pagination attempt...")
+            await asyncio.sleep(5)
+
             try:
                 r = await self._query(client, operation, cursor=cursor, **kwargs)
                 data = r.json()
