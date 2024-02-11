@@ -286,6 +286,9 @@ scraper.download_media([
 
 # trends
 scraper.trends()
+
+# lists
+scraper.tweets_from_list_ids([987, 876, 754])
 ```
 
 #### Resume Pagination

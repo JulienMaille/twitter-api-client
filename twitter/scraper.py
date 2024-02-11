@@ -96,6 +96,16 @@ class Scraper:
         """
         return self._run(Operation.UserTweets, user_ids, **kwargs)
 
+    def tweets_from_list_ids(self, list_ids: list[int], **kwargs) -> list[dict]:
+        """
+        Get tweet metadata by list ids.
+
+        @param list_ids: list of list ids
+        @param kwargs: optional keyword arguments
+        @return: list of tweet data as dicts
+        """
+        return self._run(Operation.ListLatestTweetsTimeline, list(map(str, list_ids)), **kwargs)
+
     def tweets_and_replies(self, user_ids: list[int], **kwargs) -> list[dict]:
         """
         Get tweets and replies by user ids.
