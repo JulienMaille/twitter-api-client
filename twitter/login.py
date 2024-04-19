@@ -147,6 +147,10 @@ def execute_login_flow(client: Client, **kwargs) -> Client | None:
 
 
 def login(email: str, username: str, password: str, **kwargs) -> Client:
+    ua = kwargs.get('user_agent')
+    if not ua:
+        ua = random.choice(USER_AGENTS)
+
     client = Client(
         cookies={
             "email": email,
@@ -158,7 +162,7 @@ def login(email: str, username: str, password: str, **kwargs) -> Client:
         headers={
             'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
             'content-type': 'application/json',
-            'user-agent': random.choice(USER_AGENTS),
+            'user-agent': ua,
             'x-twitter-active-user': 'yes',
             'x-twitter-client-language': 'en',
         },
