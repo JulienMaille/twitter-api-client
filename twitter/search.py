@@ -42,6 +42,7 @@ class Search:
         self.debug = kwargs.get('debug', 0)
         self.logger = self._init_logger(**kwargs)
         self.session = self._validate_session(email, username, password, session, **kwargs)
+        self.rate_limits = {}
 
     def run(self, queries: list[dict], limit: int = math.inf, out: str = 'data/search_results', **kwargs):
         out = Path(out)
@@ -85,6 +86,10 @@ class Search:
     async def get(self, client: AsyncClient, params: dict) -> tuple:
         _, qid, name = Operation.SearchTimeline
         r = await client.get(f'https://twitter.com/i/api/graphql/{qid}/{name}', params=build_params(params))
+        try:
+            self.rate_limits = {k: int(v) for k, v in r.headers.items() if 'rate-limit' in k}
+        except Exception as e:
+            self.logger.debug(f'{e}')
         if not r.is_success:
             raise TwitterResponseError(r.status_code, r.reason_phrase)
         data = r.json()
