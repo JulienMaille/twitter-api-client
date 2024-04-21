@@ -14,6 +14,7 @@ from httpx import AsyncClient, Client
 from .constants import *
 from .login import login
 from .util import get_headers, find_key, build_params
+from .exceptions import *
 
 reset = '\x1b[0m'
 colors = [f'\x1b[{i}m' for i in range(31, 37)]
@@ -41,6 +42,7 @@ class Search:
         self.debug = kwargs.get('debug', 0)
         self.logger = self._init_logger(**kwargs)
         self.session = self._validate_session(email, username, password, session, **kwargs)
+        self.rate_limits = {}
 
     def run(self, queries: list[dict], limit: int = math.inf, out: str = 'data/search_results', **kwargs):
         out = Path(out)
@@ -84,7 +86,13 @@ class Search:
     async def get(self, client: AsyncClient, params: dict) -> tuple:
         _, qid, name = Operation.SearchTimeline
         r = await client.get(f'https://twitter.com/i/api/graphql/{qid}/{name}', params=build_params(params))
-        r.raise_for_status()
+        try:
+            self.rate_limits = {k: int(v) for k, v in r.headers.items() if 'rate-limit' in k}
+        except Exception as e:
+            if self.debug:
+                self.logger.debug(f'{e}')
+        if not r.is_success:
+            raise TwitterResponseError(r.status_code, r.reason_phrase)
         data = r.json()
         cursor = self.get_cursor(data)
         entries = [y for x in find_key(data, 'entries') for y in x if re.search(r'^(tweet|user)-', y['entryId'])]
@@ -107,10 +115,16 @@ class Search:
                     for e in errors:
                         if self.debug:
                             self.logger.warning(f'{YELLOW}{e.get("message")}{RESET}')
-                        return [], [], ''
+                    for e in errors:
+                        if e.get('code') == 326 and e.get('kind') == 'Permissions':
+                            raise TwitterResponseError(TwitterResponseErrorCodeAccountLocked, e.get('message'))
+                    raise TwitterResponseError(TwitterResponseErrorCodeUnknown, orjson.dumps(data))
+                        # return [], [], ''
                 ids = set(find_key(data, 'entryId'))
                 if len(ids) >= 2:
                     return data, entries, cursor
+            except TwitterResponseError as e:
+                raise e
             except Exception as e:
                 if i == retries:
                     if self.debug:
