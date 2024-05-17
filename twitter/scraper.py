@@ -366,7 +366,7 @@ class Scraper:
                     self.logger.error(f'[{RED}error{RESET}] Failed to get trends\n{e}')
 
         async def process():
-            url = set_qs('https://twitter.com/i/api/2/guide.json', trending_params)
+            url = set_qs('https://x.com/i/api/2/guide.json', trending_params)
             offsets = utc or ["-1200", "-1100", "-1000", "-0900", "-0800", "-0700", "-0600", "-0500", "-0400", "-0300",
                               "-0200", "-0100", "+0000", "+0100", "+0200", "+0300", "+0400", "+0500", "+0600", "+0700",
                               "+0800", "+0900", "+1000", "+1100", "+1200", "+1300", "+1400"]
@@ -440,9 +440,9 @@ class Scraper:
         params = {
             'client': 'web',
             'use_syndication_guest_id': 'false',
-            'cookie_set_host': 'twitter.com',
+            'cookie_set_host': 'x.com',
         }
-        url = f'https://twitter.com/i/api/1.1/live_video_stream/status/{media_key}'
+        url = f'https://x.com/i/api/1.1/live_video_stream/status/{media_key}'
         try:
             r = await client.get(url, params=params)
             return r.json()
@@ -605,7 +605,7 @@ class Scraper:
             'variables': Operation.default_variables | keys | kwargs,
             'features': Operation.default_features,
         }
-        r = await client.get(f'https://twitter.com/i/api/graphql/{qid}/{name}', params=build_params(params))
+        r = await client.get(f'{API_URL}/{qid}/{name}', params=build_params(params))
 
         try:
             self.rate_limits[name] = {k: int(v) for k, v in r.headers.items() if 'rate-limit' in k}
@@ -747,11 +747,11 @@ class Scraper:
         async def get(c: AsyncClient, space: dict) -> list[dict]:
             media_key = space['data']['audioSpace']['metadata']['media_key']
             r = await c.get(
-                url=f'https://twitter.com/i/api/1.1/live_video_stream/status/{media_key}',
+                url=f'https://x.com/i/api/1.1/live_video_stream/status/{media_key}',
                 params={
                     'client': 'web',
                     'use_syndication_guest_id': 'false',
-                    'cookie_set_host': 'twitter.com',
+                    'cookie_set_host': 'x.com',
                 })
             r = await c.post(
                 url='https://proxsee.pscp.tv/api/v2/accessChatPublic',
@@ -800,8 +800,8 @@ class Scraper:
             try:
                 media_key = space['data']['audioSpace']['metadata']['media_key']
                 r = await client.get(
-                    url=f'https://twitter.com/i/api/1.1/live_video_stream/status/{media_key}',
-                    params={'client': 'web', 'use_syndication_guest_id': 'false', 'cookie_set_host': 'twitter.com'}
+                    url=f'https://x.com/i/api/1.1/live_video_stream/status/{media_key}',
+                    params={'client': 'web', 'use_syndication_guest_id': 'false', 'cookie_set_host': 'x.com'}
                 )
                 data = r.json()
                 room = data['shareUrl'].split('/')[-1]
@@ -809,7 +809,7 @@ class Scraper:
             except Exception as e:
                 room = space['data']['audioSpace']['metadata']['rest_id']
                 if self.debug:
-                    self.logger.error(f'Failed to get stream info for https://twitter.com/i/spaces/{room}\n{e}')
+                    self.logger.error(f'Failed to get stream info for https://x.com/i/spaces/{room}\n{e}')
 
         async def get_chunks(client: AsyncClient, url: str) -> list[str]:
             try:
@@ -923,4 +923,4 @@ class Scraper:
         Path(f'{fname or cookies.get("username")}.cookies').write_bytes(orjson.dumps(dict(cookies)))
 
     def _v1_rate_limits(self):
-        return self.session.get('https://api.twitter.com/1.1/application/rate_limit_status.json').json()
+        return self.session.get('https://api.x.com/1.1/application/rate_limit_status.json').json()

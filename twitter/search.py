@@ -85,7 +85,7 @@ class Search:
 
     async def get(self, client: AsyncClient, params: dict) -> tuple:
         _, qid, name = Operation.SearchTimeline
-        r = await client.get(f'https://twitter.com/i/api/graphql/{qid}/{name}', params=build_params(params))
+        r = await client.get(f'{API_URL}/{qid}/{name}', params=build_params(params))
         try:
             self.rate_limits = {k: int(v) for k, v in r.headers.items() if 'rate-limit' in k}
         except Exception as e:

@@ -37,9 +37,9 @@ class Account:
     def __init__(self, email: str = None, username: str = None, password: str = None, session: Client = None, **kwargs):
         self.save = kwargs.get('save', True)
         self.debug = kwargs.get('debug', 0)
-        self.gql_api = 'https://twitter.com/i/api/graphql'
-        self.v1_api = 'https://api.twitter.com/1.1'
-        self.v2_api = 'https://twitter.com/i/api/2'
+        self.gql_api = API_URL
+        self.v1_api = 'https://api.x.com/1.1'
+        self.v2_api = 'https://x.com/i/api/2'
         self.logger = self._init_logger(**kwargs)
         self.session = self._validate_session(email, username, password, session, **kwargs)
         self.rate_limits = {}
@@ -85,7 +85,7 @@ class Account:
 
         headers = get_headers(self.session)
         headers['content-type'] = 'application/x-www-form-urlencoded'
-        url = 'https://caps.twitter.com/v2/cards/create.json'
+        url = 'https://caps.x.com/v2/cards/create.json'
         r = self.session.post(url, headers=headers, params={'card_data': orjson.dumps(options).decode()})
         card_uri = r.json()['card_uri']
         r = self.tweet(text, poll_params={'card_uri': card_uri})
@@ -241,7 +241,7 @@ class Account:
         variables = {
             'tweet_text': text,
             # can use `i` as it resolves to screen_name
-            'attachment_url': f'https://twitter.com/i/status/{tweet_id}',
+            'attachment_url': f'https://x.com/i/status/{tweet_id}',
             'dark_request': False,
             'media': {
                 'media_entities': [],
@@ -412,7 +412,7 @@ class Account:
         }
         headers = get_headers(self.session)
         headers['content-type'] = 'application/x-www-form-urlencoded'
-        url = 'https://twitter.com/i/api/i/account/change_password.json'
+        url = 'https://x.com/i/api/i/account/change_password.json'
         r = self.session.post(url, headers=headers, data=urlencode(params))
         return r.json()
 
@@ -483,7 +483,7 @@ class Account:
 
     def _upload_media(self, filename: str, is_dm: bool = False, is_profile=False) -> int | None:
         """
-        https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/uploading-media/media-best-practices
+        https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/uploading-media/media-best-practices
         """
 
         def check_media(category: str, size: int) -> None:
@@ -497,11 +497,11 @@ class Account:
                 raise Exception(msg(MAX_VIDEO_SIZE))
 
         # if is_profile:
-        #     url = 'https://upload.twitter.com/i/media/upload.json'
+        #     url = 'https://upload.x.com/i/media/upload.json'
         # else:
-        #     url = 'https://upload.twitter.com/1.1/media/upload.json'
+        #     url = 'https://upload.x.com/1.1/media/upload.json'
 
-        url = 'https://upload.twitter.com/i/media/upload.json'
+        url = 'https://upload.x.com/i/media/upload.json'
 
         file = Path(filename)
         total_bytes = file.stat().st_size
@@ -827,7 +827,7 @@ class Account:
 
     def fleetline(self, params: dict = None) -> dict:
         r = self.session.get(
-            'https://twitter.com/i/api/fleets/v1/fleetline',
+            'https://x.com/i/api/fleets/v1/fleetline',
             headers=get_headers(self.session),
             params=params or {}
         )

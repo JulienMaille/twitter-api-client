@@ -11,7 +11,7 @@ from aiofiles.os import makedirs
 from httpx import Response, Client
 from textwrap import dedent
 
-from .constants import GREEN, MAGENTA, RED, RESET, MAX_GQL_CHAR_LIMIT, USER_AGENTS, ORANGE
+from .constants import GREEN, MAGENTA, RED, ORANGE, RESET, MAX_GQL_CHAR_LIMIT, USER_AGENTS, GUEST_TOKEN_URL
 
 
 def init_session():
@@ -19,7 +19,7 @@ def init_session():
         'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
         'user-agent': random.choice(USER_AGENTS),
     }, follow_redirects=True)
-    r = client.post('https://api.twitter.com/1.1/guest/activate.json').json()
+    r = client.post(GUEST_TOKEN_URL).json()
     client.headers.update({
         'content-type': 'application/json',
         'x-guest-token': r['guest_token'],
@@ -125,13 +125,13 @@ def get_headers(session, **kwargs) -> dict:
     # todo httpx cookie issues
     try:
         if session._init_with_cookies:
-            cookies.delete('ct0', domain='.twitter.com')
+            cookies.delete('ct0', domain='.x.com')
     except:
         ...
     headers = kwargs | {
         'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
         'cookie': '; '.join(f'{k}={v}' for k, v in cookies.items()),
-        'referer': 'https://twitter.com/',
+        'referer': 'https://x.com/',
         'user-agent': random.choice(USER_AGENTS),
         'x-csrf-token': cookies.get('ct0', ''),
         'x-guest-token': cookies.get('guest_token', ''),

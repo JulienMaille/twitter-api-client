@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 
+API_URL = "https://x.com/i/api/graphql"
+TASK_URL = "https://api.x.com/1.1/onboarding/task.json"
+GUEST_TOKEN_URL = "https://api.x.com/1.1/guest/activate.json"
+
 # todo: not accurate measure. value will decrease as new gql features/variables are required. (actual limitation is request size, i.e. new gql features an variables contribute to total request size)
 MAX_GQL_CHAR_LIMIT = 4_200
 

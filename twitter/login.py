@@ -3,7 +3,7 @@ import sys
 
 from httpx import Client
 
-from .constants import YELLOW, RED, BOLD, RESET, USER_AGENTS
+from .constants import YELLOW, RED, BOLD, RESET, USER_AGENTS, TASK_URL, GUEST_TOKEN_URL
 from .util import find_key
 
 def update_token(client: Client, key: str, url: str, **kwargs) -> Client:
@@ -37,11 +37,11 @@ def update_token(client: Client, key: str, url: str, **kwargs) -> Client:
 
 
 def init_guest_token(client: Client) -> Client:
-    return update_token(client, 'guest_token', 'https://api.twitter.com/1.1/guest/activate.json')
+    return update_token(client, 'guest_token', GUEST_TOKEN_URL)
 
 
 def flow_start(client: Client) -> Client:
-    return update_token(client, 'flow_token', 'https://api.twitter.com/1.1/onboarding/task.json',
+    return update_token(client, 'flow_token', TASK_URL,
                         params={'flow_name': 'login'},
                         json={
                             "input_flow_data": {
@@ -54,7 +54,7 @@ def flow_start(client: Client) -> Client:
 
 
 def flow_instrumentation(client: Client) -> Client:
-    return update_token(client, 'flow_token', 'https://api.twitter.com/1.1/onboarding/task.json', json={
+    return update_token(client, 'flow_token', TASK_URL, json={
         "flow_token": client.cookies.get('flow_token'),
         "subtask_inputs": [{
             "subtask_id": "LoginJsInstrumentationSubtask",
@@ -64,7 +64,7 @@ def flow_instrumentation(client: Client) -> Client:
 
 
 def flow_username(client: Client) -> Client:
-    return update_token(client, 'flow_token', 'https://api.twitter.com/1.1/onboarding/task.json', json={
+    return update_token(client, 'flow_token', TASK_URL, json={
         "flow_token": client.cookies.get('flow_token'),
         "subtask_inputs": [{
             "subtask_id": "LoginEnterUserIdentifierSSO",
@@ -77,7 +77,7 @@ def flow_username(client: Client) -> Client:
 
 
 def flow_password(client: Client) -> Client:
-    return update_token(client, 'flow_token', 'https://api.twitter.com/1.1/onboarding/task.json', json={
+    return update_token(client, 'flow_token', TASK_URL, json={
         "flow_token": client.cookies.get('flow_token'),
         "subtask_inputs": [{
             "subtask_id": "LoginEnterPassword",
@@ -86,7 +86,7 @@ def flow_password(client: Client) -> Client:
 
 
 def flow_duplication_check(client: Client) -> Client:
-    return update_token(client, 'flow_token', 'https://api.twitter.com/1.1/onboarding/task.json', json={
+    return update_token(client, 'flow_token', TASK_URL, json={
         "flow_token": client.cookies.get('flow_token'),
         "subtask_inputs": [{
             "subtask_id": "AccountDuplicationCheck",
@@ -96,7 +96,7 @@ def flow_duplication_check(client: Client) -> Client:
 
 
 def confirm_email(client: Client) -> Client:
-    return update_token(client, 'flow_token', 'https://api.twitter.com/1.1/onboarding/task.json', json={
+    return update_token(client, 'flow_token', TASK_URL, json={
         "flow_token": client.cookies.get('flow_token'),
         "subtask_inputs": [
             {
@@ -112,7 +112,7 @@ def confirm_email(client: Client) -> Client:
 def solve_confirmation_challenge(client: Client, **kwargs) -> Client:
     if fn := kwargs.get('proton'):
         confirmation_code = fn()
-        return update_token(client, 'flow_token', 'https://api.twitter.com/1.1/onboarding/task.json', json={
+        return update_token(client, 'flow_token', TASK_URL, json={
             "flow_token": client.cookies.get('flow_token'),
             'subtask_inputs': [
                 {
