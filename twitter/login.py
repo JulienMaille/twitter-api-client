@@ -19,12 +19,18 @@ def update_token(client: Client, key: str, url: str, **kwargs) -> Client:
         info = r.json()
 
         for task in info.get('subtasks', []):
-            if task.get('enter_text', {}).get('keyboard_type') == 'email':
+            subtask_id = task.get('subtask_id')
+            print(f"[{YELLOW}warning{RESET}] subtask_id: {subtask_id} ({caller_name})")
+            if task.get('enter_text', {}).get('keyboard_type', '') == 'email':
                 print(f"[{YELLOW}warning{RESET}] {' '.join(find_key(task, 'text'))}")
                 client.cookies.set('confirm_email', 'true')  # signal that email challenge must be solved
 
-            if task.get('subtask_id') == 'LoginAcid':
-                if task['enter_text']['hint_text'].casefold() == 'confirmation code':
+            if subtask_id == 'DenyLoginSubtask' or subtask_id == 'ArkoseLogin':
+                print(f'[{RED}error{RESET}] failed to login{RESET}')
+                client.cookies.set('login_failed', 'true')
+            
+            if subtask_id == 'LoginAcid':
+                if task.get('enter_text', {}).get('hint_text', '').casefold() == 'confirmation code':
                     print(f"[{YELLOW}warning{RESET}] email confirmation code challenge.")
                     client.cookies.set('confirmation_code', 'true')
 
@@ -130,6 +136,10 @@ def execute_login_flow(client: Client, **kwargs) -> Client | None:
     client = init_guest_token(client)
     for fn in [flow_start, flow_instrumentation, flow_username, flow_password, flow_duplication_check]:
         client = fn(client)
+
+    # login failed
+    if client.cookies.get('login_failed') == 'true':
+        return
 
     # solve email challenge
     if client.cookies.get('confirm_email') == 'true':
