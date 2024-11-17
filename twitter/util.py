@@ -14,20 +14,6 @@ from textwrap import dedent
 from .constants import GREEN, MAGENTA, RED, ORANGE, RESET, MAX_GQL_CHAR_LIMIT, USER_AGENTS, GUEST_TOKEN_URL
 
 
-def init_session():
-    client = Client(headers={
-        'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
-        'user-agent': random.choice(USER_AGENTS),
-    }, follow_redirects=True)
-    r = client.post(GUEST_TOKEN_URL).json()
-    client.headers.update({
-        'content-type': 'application/json',
-        'x-guest-token': r['guest_token'],
-        'x-twitter-active-user': 'yes',
-    })
-    return client
-
-
 def batch_ids(ids: list[int | str], char_limit: int = MAX_GQL_CHAR_LIMIT) -> list[list]:
     """To avoid 431 errors"""
     res, batch, length = [], [], 0
@@ -132,7 +118,6 @@ def get_headers(session, **kwargs) -> dict:
         'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
         'cookie': '; '.join(f'{k}={v}' for k, v in cookies.items()),
         'referer': 'https://x.com/',
-        'user-agent': random.choice(USER_AGENTS),
         'x-csrf-token': cookies.get('ct0', ''),
         'x-guest-token': cookies.get('guest_token', ''),
         'x-twitter-auth-type': 'OAuth2Session' if cookies.get('auth_token') else '',

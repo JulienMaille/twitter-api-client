@@ -630,11 +630,13 @@ class Account:
 
         # invalid credentials and session
         cookies = kwargs.get('cookies')
+        user_agent = kwargs.get('user_agent', random.choice(USER_AGENTS))
 
         # try validating cookies dict
         if isinstance(cookies, dict) and all(cookies.get(c) for c in {'ct0', 'auth_token'}):
             _session = Client(cookies=cookies, follow_redirects=True)
             _session._init_with_cookies = True
+            _session.headers.update({'user-agent': user_agent})
             _session.headers.update(get_headers(_session))
             return _session
 
@@ -642,6 +644,7 @@ class Account:
         if isinstance(cookies, str):
             _session = Client(cookies=orjson.loads(Path(cookies).read_bytes()), follow_redirects=True)
             _session._init_with_cookies = True
+            _session.headers.update({'user-agent': user_agent})
             _session.headers.update(get_headers(_session))
             return _session
 

@@ -168,7 +168,7 @@ def login(email: str, username: str, password: str, **kwargs) -> Client:
         headers={
             'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
             'content-type': 'application/json',
-            'user-agent': random.choice(USER_AGENTS),
+            'user-agent': kwargs.get('user_agent', random.choice(USER_AGENTS)),
             'x-twitter-active-user': 'yes',
             'x-twitter-client-language': 'en',
         },

@@ -764,22 +764,6 @@ class Scraper:
                 return await tqdm_asyncio.gather(*tasks, desc='Getting live transcripts')
             return await asyncio.gather(*tasks)
 
-    def space_live_transcript(self, room: str, frequency: int = 1):
-        """
-        Log live transcript of a space
-
-        @param room: room id
-        @param frequency: granularity of transcript. 1 for real-time, 2 for post-processed or "finalized" transcript
-        @return: None
-        """
-
-        async def get(spaces: list[dict]):
-            client = init_session()
-            chats = await self._get_live_chats(client, spaces)
-            await asyncio.gather(*(self._space_listener(c, frequency) for c in chats))
-
-        spaces = self.spaces(rooms=[room])
-        asyncio.run(get(spaces))
 
     def spaces_live(self, rooms: list[str]):
         """
@@ -887,20 +871,26 @@ class Scraper:
 
         # invalid credentials, try validating session
         if session and all(session.cookies.get(c) for c in {'ct0', 'auth_token'}):
+            session._init_with_cookies = True
             return session
 
         # invalid credentials and session
         cookies = kwargs.get('cookies')
+        user_agent = kwargs.get('user_agent', random.choice(USER_AGENTS))
 
         # try validating cookies dict
         if isinstance(cookies, dict) and all(cookies.get(c) for c in {'ct0', 'auth_token'}):
             _session = Client(cookies=cookies, follow_redirects=True)
+            _session._init_with_cookies = True
+            _session.headers.update({'user-agent': user_agent})
             _session.headers.update(get_headers(_session))
             return _session
 
         # try validating cookies from file
         if isinstance(cookies, str):
             _session = Client(cookies=orjson.loads(Path(cookies).read_bytes()), follow_redirects=True)
+            _session._init_with_cookies = True
+            _session.headers.update({'user-agent': user_agent})
             _session.headers.update(get_headers(_session))
             return _session
 
