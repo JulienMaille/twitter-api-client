@@ -188,4 +188,4 @@ class Search:
     def save_cookies(self, fname: str = None):
         """ Save cookies to file """
         cookies = self.session.cookies
-        Path(f'{fname or cookies.get("username")}.cookies').write_bytes(orjson.dumps(dict(cookies)))
+        Path(fname or f'{cookies.get("username")}.cookies').write_bytes(orjson.dumps(dict(cookies)))

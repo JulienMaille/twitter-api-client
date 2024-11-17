@@ -918,7 +918,7 @@ class Scraper:
     def save_cookies(self, fname: str = None):
         """ Save cookies to file """
         cookies = self.session.cookies
-        Path(f'{fname or cookies.get("username")}.cookies').write_bytes(orjson.dumps(dict(cookies)))
+        Path(fname or f'{cookies.get("username")}.cookies').write_bytes(orjson.dumps(dict(cookies)))
 
     def _v1_rate_limits(self):
         return self.session.get('https://api.x.com/1.1/application/rate_limit_status.json').json()
