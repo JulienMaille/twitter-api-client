@@ -183,7 +183,7 @@ class Search:
     @property
     def id(self) -> int:
         """ Get User ID """
-        return int(re.findall('"u=(\d+)"', self.session.cookies.get('twid'))[0])
+        return int(re.findall(r'"u=(\d+)"', self.session.cookies.get('twid'))[0])
 
     def save_cookies(self, fname: str = None):
         """ Save cookies to file """
